@@ -51,7 +51,7 @@ Run the benchmarking metrics with:
 docker run --rm -v "$PWD":/data public.ecr.aws/o8h2f0o1/pgcoe_benchmark_phase1:1.0 \
     ./metrics.py \
     --input /data/samplesheet.pairs.csv \
-    --outdir /data/analysis
+    --outdir /data/metrics
 ```
 
 > This step typically completes in just a few minutes.
