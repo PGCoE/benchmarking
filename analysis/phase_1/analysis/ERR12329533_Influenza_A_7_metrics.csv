@@ -1,0 +1,16 @@
+match,match_iupac,ins,del,sub,invalid,valid,valid_s1,invalid_s1,valid_s2,invalid_s2,del_terminal,del_internal,ins_terminal,ins_internal,seq1,seq2,invalid_char_s1,invalid_char_s2,sample,length_s1,length_s2
+464,0,0,33,0,530,497,1027,0,542,485,33,0,0,0,BU-NEIDL,DCLS,[],[np.str_('N')],ERR12329533_Influenza_A_7,982,949
+982,0,0,0,0,45,982,1027,0,1027,0,0,0,0,0,BU-NEIDL,GPHL,[],[],ERR12329533_Influenza_A_7,982,982
+982,0,0,0,0,45,982,1027,0,1027,0,0,0,0,0,BU-NEIDL,UMN,[],[],ERR12329533_Influenza_A_7,982,982
+982,0,0,0,0,45,982,1027,0,1027,0,0,0,0,0,BU-NEIDL,WAPHL,[],[],ERR12329533_Influenza_A_7,982,982
+982,0,30,0,0,15,1012,1027,0,1012,15,0,0,30,0,BU-NEIDL,WAPHL_custom,[],[np.str_('N')],ERR12329533_Influenza_A_7,982,1027
+464,0,33,0,0,530,497,542,485,1027,0,0,0,33,0,DCLS,GPHL,[np.str_('N')],[],ERR12329533_Influenza_A_7,949,982
+464,0,33,0,0,530,497,542,485,1027,0,0,0,33,0,DCLS,UMN,[np.str_('N')],[],ERR12329533_Influenza_A_7,949,982
+464,0,33,0,0,530,497,542,485,1027,0,0,0,33,0,DCLS,WAPHL,[np.str_('N')],[],ERR12329533_Influenza_A_7,949,982
+464,0,63,0,0,500,527,542,485,1012,15,0,0,63,0,DCLS,WAPHL_custom,[np.str_('N')],[np.str_('N')],ERR12329533_Influenza_A_7,949,1027
+982,0,0,0,0,45,982,1027,0,1027,0,0,0,0,0,GPHL,UMN,[],[],ERR12329533_Influenza_A_7,982,982
+982,0,0,0,0,45,982,1027,0,1027,0,0,0,0,0,GPHL,WAPHL,[],[],ERR12329533_Influenza_A_7,982,982
+982,0,30,0,0,15,1012,1027,0,1012,15,0,0,30,0,GPHL,WAPHL_custom,[],[np.str_('N')],ERR12329533_Influenza_A_7,982,1027
+982,0,0,0,0,45,982,1027,0,1027,0,0,0,0,0,UMN,WAPHL,[],[],ERR12329533_Influenza_A_7,982,982
+982,0,30,0,0,15,1012,1027,0,1012,15,0,0,30,0,UMN,WAPHL_custom,[],[np.str_('N')],ERR12329533_Influenza_A_7,982,1027
+982,0,30,0,0,15,1012,1027,0,1012,15,0,0,30,0,WAPHL,WAPHL_custom,[],[np.str_('N')],ERR12329533_Influenza_A_7,982,1027

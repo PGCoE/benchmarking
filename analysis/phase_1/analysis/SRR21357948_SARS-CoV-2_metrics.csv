@@ -1,0 +1,2 @@
+match,match_iupac,ins,del,sub,invalid,valid,valid_s1,invalid_s1,valid_s2,invalid_s2,del_terminal,del_internal,ins_terminal,ins_internal,seq1,seq2,invalid_char_s1,invalid_char_s2,sample,length_s1,length_s2
+408,0,0,14375,178,315,14961,14961,315,15276,0,1560,12815,0,0,UMN,WADDL,[np.str_('N')],[],SRR21357948_SARS-CoV-2,15276,586

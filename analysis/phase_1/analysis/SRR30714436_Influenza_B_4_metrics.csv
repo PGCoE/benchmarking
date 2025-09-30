@@ -1,0 +1,16 @@
+match,match_iupac,ins,del,sub,invalid,valid,valid_s1,invalid_s1,valid_s2,invalid_s2,del_terminal,del_internal,ins_terminal,ins_internal,seq1,seq2,invalid_char_s1,invalid_char_s2,sample,length_s1,length_s2
+321,0,88,0,0,1483,409,838,1054,1514,378,0,0,88,0,DCLS,GPHL,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_4,1450,1749
+173,0,132,0,0,1587,305,838,1054,875,1017,0,0,132,0,DCLS,UMN,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_4,1450,1882
+396,0,355,0,0,1141,751,838,1054,1892,0,0,0,355,0,DCLS,WADDL,[np.str_('N')],[],SRR30714436_Influenza_B_4,1450,1799
+396,0,333,0,0,1163,729,838,1054,1628,264,0,0,333,0,DCLS,WAPHL,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_4,1450,1880
+396,0,337,0,0,1159,733,838,1054,1877,15,0,0,337,0,DCLS,WAPHL_custom,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_4,1450,1749
+818,0,0,0,3,1071,821,1514,378,875,1017,0,0,0,0,GPHL,UMN,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_4,1749,1882
+1371,0,50,0,0,471,1421,1514,378,1892,0,0,0,50,0,GPHL,WADDL,[np.str_('N')],[],SRR30714436_Influenza_B_4,1749,1799
+1247,0,0,0,0,645,1247,1514,378,1628,264,0,0,0,0,GPHL,WAPHL,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_4,1749,1880
+1371,0,0,0,0,521,1371,1514,378,1877,15,0,0,0,0,GPHL,WAPHL_custom,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_4,1749,1749
+862,0,0,0,3,1027,865,875,1017,1892,0,0,0,0,0,UMN,WADDL,[np.str_('N')],[],SRR30714436_Influenza_B_4,1882,1799
+862,0,0,0,3,1027,865,875,1017,1628,264,0,0,0,0,UMN,WAPHL,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_4,1882,1880
+862,0,0,0,3,1027,865,875,1017,1877,15,0,0,0,0,UMN,WAPHL_custom,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_4,1882,1749
+1613,0,0,0,3,276,1616,1892,0,1628,264,0,0,0,0,WADDL,WAPHL,[],[np.str_('N')],SRR30714436_Influenza_B_4,1799,1880
+1728,0,0,50,6,108,1784,1892,0,1877,15,50,0,0,0,WADDL,WAPHL_custom,[],[np.str_('N')],SRR30714436_Influenza_B_4,1799,1749
+1606,0,0,0,0,286,1606,1628,264,1877,15,0,0,0,0,WAPHL,WAPHL_custom,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_4,1880,1749

@@ -1,0 +1,7 @@
+match,match_iupac,ins,del,sub,invalid,valid,valid_s1,invalid_s1,valid_s2,invalid_s2,del_terminal,del_internal,ins_terminal,ins_internal,seq1,seq2,invalid_char_s1,invalid_char_s2,sample,length_s1,length_s2
+902,0,796,0,0,80,1698,1778,0,1778,0,0,0,66,730,BU-NEIDL,GPHL,[],[],ERR12329533_Influenza_A_4,902,1698
+675,0,33,0,1,1069,709,1778,0,786,992,0,0,20,13,BU-NEIDL,UMN,[],[np.str_('N')],ERR12329533_Influenza_A_4,902,1701
+902,0,861,0,0,15,1763,1778,0,1766,12,0,0,131,730,BU-NEIDL,WAPHL_custom,[],[np.str_('N')],ERR12329533_Influenza_A_4,902,1775
+708,0,0,0,1,1069,709,1778,0,786,992,0,0,0,0,GPHL,UMN,[],[np.str_('N')],ERR12329533_Influenza_A_4,1698,1701
+1698,0,65,0,0,15,1763,1778,0,1766,12,0,0,65,0,GPHL,WAPHL_custom,[],[np.str_('N')],ERR12329533_Influenza_A_4,1698,1775
+708,0,65,0,1,1004,774,786,992,1766,12,0,0,65,0,UMN,WAPHL_custom,[np.str_('N')],[np.str_('N')],ERR12329533_Influenza_A_4,1701,1775

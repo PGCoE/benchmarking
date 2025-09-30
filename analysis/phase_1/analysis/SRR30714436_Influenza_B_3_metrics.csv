@@ -1,0 +1,16 @@
+match,match_iupac,ins,del,sub,invalid,valid,valid_s1,invalid_s1,valid_s2,invalid_s2,del_terminal,del_internal,ins_terminal,ins_internal,seq1,seq2,invalid_char_s1,invalid_char_s2,sample,length_s1,length_s2
+138,0,0,0,0,2141,138,900,1379,646,1633,0,0,0,0,DCLS,GPHL,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_3,1811,2179
+151,0,0,0,0,2128,151,900,1379,670,1609,0,0,0,0,DCLS,UMN,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_3,1811,2204
+432,0,344,0,0,1503,776,900,1379,2279,0,0,0,340,4,DCLS,WADDL,[np.str_('N')],[],SRR30714436_Influenza_B_3,1811,2096
+432,0,192,0,0,1655,624,900,1379,1881,398,0,0,192,0,DCLS,WAPHL,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_3,1811,2204
+432,0,386,0,0,1461,818,900,1379,2062,217,0,0,386,0,DCLS,WAPHL_custom,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_3,1811,2275
+434,0,0,0,0,1845,434,646,1633,670,1609,0,0,0,0,GPHL,UMN,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_3,2179,2204
+546,0,8,0,0,1725,554,646,1633,2279,0,0,0,4,4,GPHL,WADDL,[np.str_('N')],[],SRR30714436_Influenza_B_3,2179,2096
+546,0,0,0,0,1733,546,646,1633,1881,398,0,0,0,0,GPHL,WAPHL,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_3,2179,2204
+546,0,50,0,0,1683,596,646,1633,2062,217,0,0,50,0,GPHL,WAPHL_custom,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_3,2179,2275
+595,0,4,0,0,1680,599,670,1609,2279,0,0,0,0,4,UMN,WADDL,[np.str_('N')],[],SRR30714436_Influenza_B_3,2204,2096
+595,0,0,0,0,1684,595,670,1609,1881,398,0,0,0,0,UMN,WAPHL,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_3,2204,2204
+595,0,27,0,0,1657,622,670,1609,2062,217,0,0,27,0,UMN,WAPHL_custom,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_3,2204,2275
+1667,0,59,4,80,469,1810,2279,0,1881,398,0,4,59,0,WADDL,WAPHL,[],[np.str_('N')],SRR30714436_Influenza_B_3,2096,2204
+1845,0,105,4,108,217,2062,2279,0,2062,217,0,4,105,0,WADDL,WAPHL_custom,[],[np.str_('N')],SRR30714436_Influenza_B_3,2096,2275
+1806,0,27,0,0,446,1833,1881,398,2062,217,0,0,27,0,WAPHL,WAPHL_custom,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_3,2204,2275

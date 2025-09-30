@@ -1,0 +1,7 @@
+match,match_iupac,ins,del,sub,invalid,valid,valid_s1,invalid_s1,valid_s2,invalid_s2,del_terminal,del_internal,ins_terminal,ins_internal,seq1,seq2,invalid_char_s1,invalid_char_s2,sample,length_s1,length_s2
+2057,0,217,0,0,67,2274,2341,0,2341,0,0,0,0,217,BU-NEIDL,GPHL,[],[],ERR12329533_Influenza_A_2,2057,2274
+1048,0,99,0,1,1193,1148,2341,0,1215,1126,0,0,0,99,BU-NEIDL,UMN,[],[np.str_('N')],ERR12329533_Influenza_A_2,2057,2274
+2057,0,272,0,0,12,2329,2341,0,2329,12,0,0,55,217,BU-NEIDL,WAPHL_custom,[],[np.str_('N')],ERR12329533_Influenza_A_2,2057,2341
+1147,0,0,0,1,1193,1148,2341,0,1215,1126,0,0,0,0,GPHL,UMN,[],[np.str_('N')],ERR12329533_Influenza_A_2,2274,2274
+2274,0,55,0,0,12,2329,2341,0,2329,12,0,0,55,0,GPHL,WAPHL_custom,[],[np.str_('N')],ERR12329533_Influenza_A_2,2274,2341
+1147,0,55,0,1,1138,1203,1215,1126,2329,12,0,0,55,0,UMN,WAPHL_custom,[np.str_('N')],[np.str_('N')],ERR12329533_Influenza_A_2,2274,2341

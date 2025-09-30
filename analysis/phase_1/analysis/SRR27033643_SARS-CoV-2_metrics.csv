@@ -1,0 +1,7 @@
+match,match_iupac,ins,del,sub,invalid,valid,valid_s1,invalid_s1,valid_s2,invalid_s2,del_terminal,del_internal,ins_terminal,ins_internal,seq1,seq2,invalid_char_s1,invalid_char_s2,sample,length_s1,length_s2
+29244,0,17,3,6,640,29270,29309,601,29696,214,0,3,0,17,DCLS,UMN,[np.str_('N')],[np.str_('N')],SRR27033643_SARS-CoV-2,29854,29884
+13659,0,0,3,0,16248,13662,29309,601,13666,16244,0,3,0,0,DCLS,UVA_SOM,[np.str_('N')],[np.str_('N')],SRR27033643_SARS-CoV-2,29854,29903
+29246,0,13,6,1,644,29266,29309,601,29910,0,3,3,0,13,DCLS,WADDL,[np.str_('N')],[],SRR27033643_SARS-CoV-2,29854,29641
+13658,0,0,0,1,16251,13659,29696,214,13666,16244,0,0,0,0,UMN,UVA_SOM,[np.str_('N')],[np.str_('N')],SRR27033643_SARS-CoV-2,29884,29903
+29627,0,5,34,9,235,29675,29696,214,29910,0,15,19,0,5,UMN,WADDL,[np.str_('N')],[],SRR27033643_SARS-CoV-2,29884,29641
+13659,0,4,0,0,16247,13663,13666,16244,29910,0,0,0,0,4,UVA_SOM,WADDL,[np.str_('N')],[],SRR27033643_SARS-CoV-2,29903,29641

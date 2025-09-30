@@ -1,0 +1,16 @@
+match,match_iupac,ins,del,sub,invalid,valid,valid_s1,invalid_s1,valid_s2,invalid_s2,del_terminal,del_internal,ins_terminal,ins_internal,seq1,seq2,invalid_char_s1,invalid_char_s2,sample,length_s1,length_s2
+0,0,0,30,0,4425,30,2709,1746,2233,2222,30,0,0,0,DCLS,GPHL,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_1,1776,2222
+0,0,39,0,0,4416,39,2709,1746,2458,1997,0,0,39,0,DCLS,UMN,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_1,1776,2368
+30,0,233,0,0,4192,263,2709,1746,4455,0,0,0,233,0,DCLS,WADDL,[np.str_('N')],[],SRR30714436_Influenza_B_1,1776,2009
+30,0,111,0,0,4314,141,2709,1746,3431,1024,0,0,111,0,DCLS,WAPHL,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_1,1776,2368
+30,0,186,0,0,4239,216,2709,1746,3764,691,0,0,186,0,DCLS,WAPHL_custom,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_1,1776,2340
+0,0,371,0,0,4084,371,2233,2222,2458,1997,0,0,371,0,GPHL,UMN,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_1,2222,2368
+0,0,1944,0,0,2511,1944,2233,2222,4455,0,0,0,1944,0,GPHL,WADDL,[np.str_('N')],[],SRR30714436_Influenza_B_1,2222,2009
+0,0,1344,0,0,3111,1344,2233,2222,3431,1024,0,0,1344,0,GPHL,WAPHL,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_1,2222,2368
+0,0,1614,0,0,2841,1614,2233,2222,3764,691,0,0,1614,0,GPHL,WAPHL_custom,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_1,2222,2340
+371,0,4,0,0,4080,375,2458,1997,4455,0,0,0,4,0,UMN,WADDL,[np.str_('N')],[],SRR30714436_Influenza_B_1,2368,2009
+367,0,0,0,0,4088,367,2458,1997,3431,1024,0,0,0,0,UMN,WAPHL,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_1,2368,2368
+371,0,0,0,0,4084,371,2458,1997,3764,691,0,0,0,0,UMN,WAPHL_custom,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_1,2368,2340
+1344,0,0,4,0,3107,1348,4455,0,3431,1024,4,0,0,0,WADDL,WAPHL,[],[np.str_('N')],SRR30714436_Influenza_B_1,2009,2368
+1604,0,0,4,45,2802,1653,4455,0,3764,691,0,4,0,0,WADDL,WAPHL_custom,[],[np.str_('N')],SRR30714436_Influenza_B_1,2009,2340
+1344,0,0,0,0,3111,1344,3431,1024,3764,691,0,0,0,0,WAPHL,WAPHL_custom,[np.str_('N')],[np.str_('N')],SRR30714436_Influenza_B_1,2368,2340
