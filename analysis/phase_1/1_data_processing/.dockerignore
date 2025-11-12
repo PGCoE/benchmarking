@@ -1,0 +1,7 @@
+**/assemblies/
+**/prepared_entries/
+**/data_formatted
+**/data_raw/
+**/metrics/
+samplesheet.pairs.csv
+samplesheet.singles.csv
