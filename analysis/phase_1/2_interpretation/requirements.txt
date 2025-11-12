@@ -1,0 +1,13 @@
+# Core dependencies
+streamlit>=1.28.0
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Visualization
+plotly>=5.14.0
+
+# Scientific computing
+scipy>=1.11.0
+
+# Optional: for better performance
+pyarrow>=12.0.0
