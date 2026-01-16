@@ -228,7 +228,7 @@ if df_filtered is not None and not df_filtered.empty:
     with col1:
         fig_pearson = stats.plot_corr_bar(
             pearson_df,
-            title="Pearson Correlation (R^2) of Metrics with PCoA Axes 1"
+            title="Pearson Correlation (R^2) of Metrics with PCoA Axis 1"
         )
         st.plotly_chart(
             fig_pearson,
@@ -239,7 +239,7 @@ if df_filtered is not None and not df_filtered.empty:
     with col2:
         fig_spearman = stats.plot_corr_bar(
             spearman_df,
-            title="Spearman Correlation of Metrics with PCoA Axes 1"
+            title="Spearman Correlation of Metrics with PCoA Axis 1"
         )
         st.plotly_chart(
             fig_spearman,
