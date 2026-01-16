@@ -536,10 +536,10 @@ def corr_w_pcoa_axes(
     var_df: pd.DataFrame,
     coords_df: pd.DataFrame,
     cols: Optional[Dict[str, str]] = \
-        {"ins": "Insertions", "del": "Deletions", "sub": "Substitutions", 
-         "invalid": "Invalid", "valid": "Valid", "del_terminal": "Terminal Deletions",
-         "del_internal": "Internal Deletions", "ins_terminal": "Terminal Insertions",
-         "ins_internal": "Internal Insertions"},
+        {"ins_frac": "Insertions", "del_frac": "Deletions", "sub_frac": "Substitutions", "valid_frac": "Valid"}, #, 
+#         "invalid_frac": "Invalid", "valid_frac": "Valid", "del_terminal_frac": "Terminal Deletions",
+#         "del_internal_frac": "Internal Deletions", "ins_terminal_frac": "Terminal Insertions",
+ #        "ins_internal_frac": "Internal Insertions"},
     qc_threshold: float = 0 # temporarily set to override
 ) -> pd.DataFrame:
     """
