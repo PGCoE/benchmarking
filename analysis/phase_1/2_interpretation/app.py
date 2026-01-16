@@ -220,6 +220,63 @@ if df_filtered is not None and not df_filtered.empty:
             config={"displayModeBar": False}
         )
 
+    # PCoA correlations
+    st.divider()
+    st.subheader(f"Correlation with PCoA Axis 1")
+    pearson_df, spearman_df, pearson_df_2, spearman_df_2 = stats.corr_w_pcoa_axes(df_filtered, coords_df)
+    col1, col2 = st.columns([1, 1])
+
+    with col1:
+        fig_pearson = stats.plot_corr_bar(
+            pearson_df,
+            title=f"R^2 of Metrics with PCo Axis 1"
+        )
+        st.plotly_chart(
+            fig_pearson,
+            use_container_width=True,
+            config={"displayModeBar": False}
+        )
+
+    with col2:
+        fig_spearman = stats.plot_corr_bar(
+            spearman_df,
+            title=f"Spearman Correlation of Metrics with PCo Axis 1"
+        )
+        st.plotly_chart(
+            fig_spearman,
+            use_container_width=True,
+            config={"displayModeBar": False}
+        )
+
+    # incorporate interpretation w/PCoA axis 2 if available
+    if isinstance(pearson_df_2, pd.DataFrame):
+        st.divider()
+        st.subheader(f"Correlation with PCoA Axes 1 and 2")
+        col1, col2 = st.columns([1, 1])
+
+        with col1:
+            fig_pearson_2 = stats.plot_corr_bar(
+                pearson_df_2,
+                title=f"Unsigned Summed R^2 of Metrics with PCoA Axes 1 & 2"
+            )
+            st.plotly_chart(
+                fig_pearson_2,
+                use_container_width=True,
+                config={"displayModeBar": False}
+            )
+    
+        with col2:
+            fig_spearman_2 = stats.plot_corr_bar(
+                spearman_df_2,
+                title=f"Summed Spearman Correlation of Metrics with PCoA Axes 1 & 2"
+            )
+            st.plotly_chart(
+                fig_spearman_2,
+                use_container_width=True,
+                config={"displayModeBar": False}
+            )
+    
+    
 elif df is not None and df_filtered is not None and df_filtered.empty:
     st.warning(
         "No rows after Stage 2 filtering. "
