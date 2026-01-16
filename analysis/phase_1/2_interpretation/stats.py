@@ -549,9 +549,9 @@ def corr_w_pcoa_axes(
     spearman_results = defaultdict(dict)
     pcoa_axes = coords_df.columns.tolist()
 
+    # calculate the mean of each variable for each submitter (can be vectorized)
     submitters = sorted(set(var_df['seq1']).union(set(var_df['seq2'])))
     submitter_df = pd.DataFrame(index=submitters, columns=cols.keys())
-
     for submitter in submitters:
         seq1_submitter = var_df[var_df["seq1"] == submitter]
         seq2_submitter = var_df[var_df["seq2"] == submitter]
@@ -560,6 +560,7 @@ def corr_w_pcoa_axes(
             mean_var = submitter_subset_df[var].mean()
             submitter_df.at[submitter, var] = mean_var
 
+    # calculate correlation with each PCoA axis
     submitter_df = submitter_df.reindex(coords_df.index)
     for var in cols:
         var_values = submitter_df[var].astype(float).values            
@@ -582,12 +583,25 @@ def corr_w_pcoa_axes(
                 f"the QC threshold of {qc_threshold:.2f} (got {total_pearson:.4f})."
             )
 
+    # extract the first principal coordinate ASSUMING it's ordered first
     pearson_pco1_res = {var: axes[pcoa_axes[0]] for var, axes in pearson_results.items()}
     spearman_pco1_res = {var: axes[pcoa_axes[0]] for var, axes in spearman_results.items()}
+    pearson_pco1_df = pd.DataFrame.from_dict(pearson_pco1_res, orient='index').transpose()
+    spearman_pco1_df = pd.DataFrame.from_dict(spearman_pco1_res, orient='index').transpose()
 
-    pearson_df = pd.DataFrame.from_dict(pearson_pco1_res, orient='index').transpose()
-    spearman_df = pd.DataFrame.from_dict(spearman_pco1_res, orient='index').transpose()
-    return pearson_df, spearman_df
+    # if there are multiple axes, sum the first two
+    if len(pcoa_axes) > 1:
+        pearson_pco1_2_res = {var: axes[pcoa_axes[0]] + axes[pcoa_axes[1]] \
+                       for var, axes in pearson_results.items()}
+        spearman_pco1_2_res = {var: axes[pcoa_axes[0]] + axes[pcoa_axes[1]] \
+                        for var, axes in spearman_results.items()}
+        pearson_pco1_2_df = pd.DataFrame.from_dict(pearson_pco1_2_res, orient='index').transpose()
+        spearman_pco1_2_df = pd.DataFrame.from_dict(spearman_pco1_2_res, orient='index').transpose()
+    else:
+        pearson_pco1_2_df = None
+        spearman_pco1_2_df = None
+
+    return pearson_pco1_df, spearman_pco1_df, pearson_pco1_2_df, spearman_pco1_2_df
 
 
 def plot_corr_bar(
