@@ -573,7 +573,7 @@ def corr_w_pcoa_axes(
 
             # Pearson correlation
             pearson_r, _ = pearsonr(var_values, pcoa_values)
-            pearson_results[var][axis] = pearson_r
+            pearson_results[var][axis] = pearson_r ** 2
 
             # Spearman correlation
             spearman_r, _ = spearmanr(var_values, pcoa_values)
