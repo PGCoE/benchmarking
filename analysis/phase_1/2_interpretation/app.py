@@ -220,6 +220,33 @@ if df_filtered is not None and not df_filtered.empty:
             config={"displayModeBar": False}
         )
 
+    st.divider()
+    st.subheader("Correlation with PCoA Axis 1")
+    pearson_df, spearman_df = stats.corr_w_pcoa_axes(df_filtered, coords_df)
+    col1, col2 = st.columns([1, 1])
+
+    with col1:
+        fig_pearson = stats.plot_corr_bar(
+            pearson_df,
+            title="Pearson Correlation (R^2) of Metrics with PCoA Axes 1"
+        )
+        st.plotly_chart(
+            fig_pearson,
+            use_container_width=True,
+            config={"displayModeBar": False}
+        )
+
+    with col2:
+        fig_spearman = stats.plot_corr_bar(
+            spearman_df,
+            title="Spearman Correlation of Metrics with PCoA Axes 1"
+        )
+        st.plotly_chart(
+            fig_spearman,
+            use_container_width=True,
+            config={"displayModeBar": False}
+        )
+
 elif df is not None and df_filtered is not None and df_filtered.empty:
     st.warning(
         "No rows after Stage 2 filtering. "

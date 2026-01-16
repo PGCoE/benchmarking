@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import scipy.cluster.hierarchy as sch
 from scipy.spatial.distance import squareform
+from scipy.stats import pearsonr, spearmanr
 import plotly.express as px
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
@@ -528,4 +529,94 @@ def build_heatmap(
         margin=dict(l=10, r=10, t=40, b=10),
     )
     
+    return fig
+
+
+def corr_w_pcoa_axes(
+    var_df: pd.DataFrame,
+    coords_df: pd.DataFrame,
+    cols: Optional[Iterable[str]] = {"ins": "Insertions", "del": "Deletions", "sub": "Substitutions", "invalid": "Invalid", "valid": "Valid"},
+    qc_threshold: float = 0 # temporarily set to override
+) -> pd.DataFrame:
+    """
+    Compute the Pearson and Spearman correlation coefficients of input
+    variables with PCoA axes
+
+    Ensure that Pearson correlation coefficient sums to > qc_threshold
+    """
+
+    pearson_results = defaultdict(dict)
+    spearman_results = defaultdict(dict)
+    pcoa_axes = coords_df.columns.tolist()
+
+    submitters = sorted(set(var_df['seq1']).union(set(var_df['seq2'])))
+    submitter_df = pd.DataFrame(index=submitters, columns=cols.keys())
+
+    for submitter in submitters:
+        seq1_submitter = var_df[var_df["seq1"] == submitter]
+        seq2_submitter = var_df[var_df["seq2"] == submitter]
+        submitter_subset_df = pd.concat([seq1_submitter, seq2_submitter]).drop_duplicates()
+        for var in cols:
+            mean_var = submitter_subset_df[var].mean()
+            submitter_df.at[submitter, var] = mean_var
+
+    submitter_df = submitter_df.reindex(coords_df.index)
+    for var in cols:
+        var_values = submitter_df[var].astype(float).values            
+        for axis in pcoa_axes:
+            pcoa_values = coords_df[axis].astype(float).values
+
+            # Pearson correlation
+            pearson_r, _ = pearsonr(var_values, pcoa_values)
+            pearson_results[var][axis] = pearson_r
+
+            # Spearman correlation
+            spearman_r, _ = spearmanr(var_values, pcoa_values)
+            spearman_results[var][axis] = spearman_r
+
+    for var, axes in pearson_results.items():
+        total_pearson = sum(abs(r) for r in axes.values())
+        if total_pearson < qc_threshold:
+            raise ValueError(
+                f"Pearson correlation sum across PCo axes for variable '{var}' is below "
+                f"the QC threshold of {qc_threshold:.2f} (got {total_pearson:.4f})."
+            )
+
+    pearson_pco1_res = {var: axes[pcoa_axes[0]] for var, axes in pearson_results.items()}
+    spearman_pco1_res = {var: axes[pcoa_axes[0]] for var, axes in spearman_results.items()}
+
+    pearson_df = pd.DataFrame.from_dict(pearson_pco1_res, orient='index').transpose()
+    spearman_df = pd.DataFrame.from_dict(spearman_pco1_res, orient='index').transpose()
+    return pearson_df, spearman_df
+
+
+def plot_corr_bar(
+    corr_df: pd.DataFrame,
+    title: str,
+) -> go.Figure:
+    """
+    Create a bar plot for correlation coefficients.
+    
+    Args:
+        corr_df: DataFrame with correlation coefficients (rows = axes, cols = variables)
+        title: Plot title
+    """
+    # Melt DataFrame for plotting
+    df_melted = corr_df.melt(var_name="Variable", value_name="Correlation")
+
+    # initialize figure
+    fig = go.Figure()
+
+    # add bar
+    fig.add_trace(go.Bar(x=df_melted["Variable"],
+                            y=df_melted["Correlation"]))
+#                            legendgroup=, scalegroup=software, name=software,
+ #                           line_color=colors[software]))
+
+    fig.update_yaxes(range=[0, 1])
+    #fig.update_traces(box_visible=True, meanline_visible=True, points="outliers")
+    fig.update_layout(#barmode="group",
+                      yaxis_title=title,
+                      font=dict(size=20, color="black"))
+
     return fig
