@@ -536,7 +536,8 @@ def corr_w_pcoa_axes(
     var_df: pd.DataFrame,
     coords_df: pd.DataFrame,
     cols: Optional[Dict[str, str]] = \
-        {"ins_frac": "Insertion Fraction", "del_frac": "Deletion Fraction", "sub_frac": "Substitution Fraction", "valid_frac": "Valid Fraction"}, #, 
+        {"ins_frac": "Insertion Fraction", "del_frac": "Deletion Fraction", "sub_frac": "Substitution Fraction"}, 
+        #"valid_frac": "Valid Fraction",
 #         "invalid_frac": "Invalid", "valid_frac": "Valid", "del_terminal_frac": "Terminal Deletions",
 #         "del_internal_frac": "Internal Deletions", "ins_terminal_frac": "Terminal Insertions",
  #        "ins_internal_frac": "Internal Insertions"},
@@ -591,7 +592,8 @@ def corr_w_pcoa_axes(
     # quality control threshold check
     # NEEDS to be thought through - at present, I don't think this makes sense
     # My hunch is that we expect the substitutions, deletions, and insertions R^2 to
-    # sum to 1 overall, while factoring in the relative contribution of each PCo axis
+    # sum to 1 overall, while factoring in the relative contribution of each PCo axis.
+    # This would need to be modified
     for var, axes in pearson_results.items():
         total_pearson = sum(abs(r) for r in axes.values())
         if total_pearson < qc_threshold:
