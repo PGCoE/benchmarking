@@ -597,9 +597,9 @@ def corr_w_pcoa_axes(
 
     # if there are multiple axes, sum the first two
     if len(pcoa_axes) > 1:
-        pearson_pco1_2_res = {var: axes[pcoa_axes[0]] + axes[pcoa_axes[1]] \
+        pearson_pco1_2_res = {var: abs(axes[pcoa_axes[0]]) + abs(axes[pcoa_axes[1]]) \
                        for var, axes in pearson_results.items()}
-        spearman_pco1_2_res = {var: axes[pcoa_axes[0]] + axes[pcoa_axes[1]] \
+        spearman_pco1_2_res = {var: abs(axes[pcoa_axes[0]]) + abs(axes[pcoa_axes[1]]) \
                         for var, axes in spearman_results.items()}
         pearson_pco1_2_df = pd.DataFrame.from_dict(pearson_pco1_2_res, orient='index').transpose()
         spearman_pco1_2_df = pd.DataFrame.from_dict(spearman_pco1_2_res, orient='index').transpose()
