@@ -590,6 +590,8 @@ def corr_w_pcoa_axes(
 
     # quality control threshold check
     # NEEDS to be thought through - at present, I don't think this makes sense
+    # My hunch is that we expect the substitutions, deletions, and insertions R^2 to
+    # sum to 1 overall, while factoring in the relative contribution of each PCo axis
     for var, axes in pearson_results.items():
         total_pearson = sum(abs(r) for r in axes.values())
         if total_pearson < qc_threshold:
