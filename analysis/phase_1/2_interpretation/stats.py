@@ -536,7 +536,7 @@ def corr_w_pcoa_axes(
     var_df: pd.DataFrame,
     coords_df: pd.DataFrame,
     cols: Optional[Dict[str, str]] = \
-        {"ins_frac": "Insertions", "del_frac": "Deletions", "sub_frac": "Substitutions", "valid_frac": "Valid"}, #, 
+        {"ins_frac": "Insertion Fraction", "del_frac": "Deletion Fraction", "sub_frac": "Substitution Fraction", "valid_frac": "Valid Fraction"}, #, 
 #         "invalid_frac": "Invalid", "valid_frac": "Valid", "del_terminal_frac": "Terminal Deletions",
 #         "del_internal_frac": "Internal Deletions", "ins_terminal_frac": "Terminal Insertions",
  #        "ins_internal_frac": "Internal Insertions"},
@@ -545,6 +545,8 @@ def corr_w_pcoa_axes(
     """
     Compute the Pearson and Spearman correlation coefficients of input
     variables with PCoA axes
+
+    Input cols corresponds to correlations
 
     Ensure that Pearson correlation coefficient sums to > qc_threshold
     """
@@ -559,21 +561,26 @@ def corr_w_pcoa_axes(
     for submitter in submitters:
         seq1_submitter = var_df[var_df["seq1"] == submitter]
         seq2_submitter = var_df[var_df["seq2"] == submitter]
+        # get all instances of submitter w/o duplicates if they exist
         submitter_subset_df = pd.concat([seq1_submitter, seq2_submitter]).drop_duplicates()
         for var in cols:
+            # calculate the mean for this variable
             mean_var = submitter_subset_df[var].mean()
             submitter_df.at[submitter, var] = mean_var
 
-    # calculate correlation with each PCoA axis
+    # calculate correlation with each PCoA axis (can be vectorized)
     submitter_df = submitter_df.reindex(coords_df.index)
     for var in cols:
+        # prepare for correlation
         var_values = submitter_df[var].astype(float).values            
         for axis in pcoa_axes:
             pcoa_values = coords_df[axis].astype(float).values
 
             # Pearson correlation
             pearson_r, _ = pearsonr(var_values, pcoa_values)
+            # R^2
             rsquared_unsigned = pearson_r ** 2
+            # incorporate sign
             rsquared_signed = np.sign(pearson_r) * rsquared_unsigned
             pearson_results[var][axis] = rsquared_signed
 
@@ -581,6 +588,8 @@ def corr_w_pcoa_axes(
             spearman_r, _ = spearmanr(var_values, pcoa_values)
             spearman_results[var][axis] = spearman_r
 
+    # quality control threshold check
+    # NEEDS to be thought through - at present, I don't think this makes sense
     for var, axes in pearson_results.items():
         total_pearson = sum(abs(r) for r in axes.values())
         if total_pearson < qc_threshold:

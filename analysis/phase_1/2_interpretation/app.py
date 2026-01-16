@@ -220,6 +220,7 @@ if df_filtered is not None and not df_filtered.empty:
             config={"displayModeBar": False}
         )
 
+    # PCoA correlations
     st.divider()
     st.subheader(f"Correlation with PCoA Axis 1")
     pearson_df, spearman_df, pearson_df_2, spearman_df_2 = stats.corr_w_pcoa_axes(df_filtered, coords_df)
@@ -247,6 +248,7 @@ if df_filtered is not None and not df_filtered.empty:
             config={"displayModeBar": False}
         )
 
+    # incorporate interpretation w/PCoA axis 2 if available
     if isinstance(pearson_df_2, pd.DataFrame):
         st.divider()
         st.subheader(f"Correlation with PCoA Axes 1 and 2")
