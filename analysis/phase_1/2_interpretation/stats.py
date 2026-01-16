@@ -639,13 +639,9 @@ def plot_corr_bar(
     # add bar
     fig.add_trace(go.Bar(x=df_melted["Variable"],
                             y=df_melted["Correlation"]))
-#                            legendgroup=, scalegroup=software, name=software,
- #                           line_color=colors[software]))
 
     fig.update_yaxes(range=[-1, 1])
-    #fig.update_traces(box_visible=True, meanline_visible=True, points="outliers")
-    fig.update_layout(#barmode="group",
-                      yaxis_title=title,
+    fig.update_layout(yaxis_title=title,
                       font=dict(size=20, color="black"))
 
     return fig
