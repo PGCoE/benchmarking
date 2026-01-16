@@ -573,7 +573,9 @@ def corr_w_pcoa_axes(
 
             # Pearson correlation
             pearson_r, _ = pearsonr(var_values, pcoa_values)
-            pearson_results[var][axis] = pearson_r ** 2
+            rsquared_unsigned = pearson_r ** 2
+            rsquared_signed = np.sign(pearson_r) * rsquared_unsigned
+            pearson_results[var][axis] = rsquared_signed
 
             # Spearman correlation
             spearman_r, _ = spearmanr(var_values, pcoa_values)
@@ -631,7 +633,7 @@ def plot_corr_bar(
 #                            legendgroup=, scalegroup=software, name=software,
  #                           line_color=colors[software]))
 
-    fig.update_yaxes(range=[0, 1])
+    fig.update_yaxes(range=[-1, 1])
     #fig.update_traces(box_visible=True, meanline_visible=True, points="outliers")
     fig.update_layout(#barmode="group",
                       yaxis_title=title,
