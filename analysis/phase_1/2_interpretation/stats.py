@@ -1,4 +1,4 @@
-from typing import List, Tuple, Iterable, Optional
+from typing import Dict, List, Tuple, Iterable, Optional
 from pathlib import Path
 from collections import defaultdict
 
@@ -535,7 +535,11 @@ def build_heatmap(
 def corr_w_pcoa_axes(
     var_df: pd.DataFrame,
     coords_df: pd.DataFrame,
-    cols: Optional[Iterable[str]] = {"ins": "Insertions", "del": "Deletions", "sub": "Substitutions", "invalid": "Invalid", "valid": "Valid"},
+    cols: Optional[Dict[str, str]] = \
+        {"ins": "Insertions", "del": "Deletions", "sub": "Substitutions", 
+         "invalid": "Invalid", "valid": "Valid", "del_terminal": "Terminal Deletions",
+         "del_internal": "Internal Deletions", "ins_terminal": "Terminal Insertions",
+         "ins_internal": "Internal Insertions"},
     qc_threshold: float = 0 # temporarily set to override
 ) -> pd.DataFrame:
     """
