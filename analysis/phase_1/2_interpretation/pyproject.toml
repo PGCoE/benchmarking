@@ -1,0 +1,18 @@
+[project]
+name = "pgcoe_vbd"
+version = "0.1.0"
+description = "PGCoE Viral Benchmarking Dashboard"
+requires-python = ">=3.10"
+dependencies = [
+  "streamlit",
+  "numpy",
+  "pandas",
+  "plotly",
+  "scipy",
+  "biopython",
+  "screed",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"

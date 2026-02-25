@@ -19,7 +19,7 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-def exportData(data, filename):
+def export_data(data, filename):
     if len(data) > 0:
         with open(filename, "w", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=data[0].keys())
@@ -56,8 +56,8 @@ def main():
             for i in v:
                 pairs.append(i)
 
-    exportData(pairs, f'samplesheet.pairs.csv')
-    exportData(singles, f'samplesheet.singles.csv')
+    export_data(pairs, f'samplesheet.pairs.csv')
+    export_data(singles, f'samplesheet.singles.csv')
             
 if __name__ == "__main__":
     main()
