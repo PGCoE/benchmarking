@@ -75,7 +75,7 @@ def apply_selection(df, col):
         st.session_state[pill_key_prev] = st.session_state[pill_key]
     
     with st.expander(col):
-        st.pills(None, opts, selection_mode="multi", key=pill_key, on_change=normalize)
+        st.pills(col, opts, selection_mode="multi", key=pill_key, on_change=normalize, label_visibility='hidden')
 
     select = st.session_state[pill_key]
     select_orig = "All" if "All" in select else count.loc[count[col].isin(select), col_1].tolist()

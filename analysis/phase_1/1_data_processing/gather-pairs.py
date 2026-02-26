@@ -31,10 +31,13 @@ def main():
     version = "1.0"
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=str, nargs='+', required=True, help="Samplehseet paths")
+    parser.add_argument("--input", type=str, nargs='+', required=True, help="Samplesheet paths")
+    parser.add_argument("--outdir", type=str, default=".", help="Output directory (default: current directory)")
     parser.add_argument('--version', action='version', version=version)
     
     args = parser.parse_args()
+
+    os.makedirs(args.outdir, exist_ok=True)
 
     start = f"""
     gather-pairs.py v{version}
@@ -56,8 +59,8 @@ def main():
             for i in v:
                 pairs.append(i)
 
-    export_data(pairs, f'samplesheet.pairs.csv')
-    export_data(singles, f'samplesheet.singles.csv')
+    export_data(pairs, os.path.join(args.outdir, 'samplesheet.pairs.csv'))
+    export_data(singles, os.path.join(args.outdir, 'samplesheet.singles.csv'))
             
 if __name__ == "__main__":
     main()

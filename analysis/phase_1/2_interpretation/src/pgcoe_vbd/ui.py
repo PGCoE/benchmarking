@@ -65,6 +65,7 @@ def data_processing_options():
     # Terminal indels
     st.markdown("### Terminal indels")
     ignore_termini = st.toggle('Ignore Termini', value=False, help="Insertions / Deletions at the end of sequences will be considered `invalid` and not included in the similarity / dissimilarity calculations.")
+    st.session_state.ignore_termini = ignore_termini
 
     # Add row stats
     st.session_state.df_stats = data_format.row_stats(df, ignore_termini)
@@ -99,7 +100,11 @@ def apply_filters():
     st.session_state["samples_f1"] = len(df_subset)
 
     st.markdown("### Filter 2: Include variables")
-    filt_cols  = [ col for col in set(g_opts) if col not in data_filter.FILT_COLS_EXCLUDE ]
+    exclude = set(data_filter.FILT_COLS_EXCLUDE) | {gcol}
+    filt_cols = [gcol] + [
+        col for col in g_opts
+        if col not in exclude
+    ]
     selections = []
     for col in filt_cols:
         selections.append(data_filter.apply_selection(df_subset, col))
@@ -185,7 +190,7 @@ def sample_view():
 
     fig_sample_dist = st.session_state.fig_sample_dist
     if fig_sample_dist:
-        sample_selection = st.plotly_chart(fig_sample_dist, use_container_width=False, config={"displayModeBar": False}, on_select='rerun', selection_mode='points')
+        sample_selection = st.plotly_chart(fig_sample_dist, use_container_width=False, on_select='rerun', selection_mode='points')
 
         points = sample_selection.get('selection', {}).get('points', [])
 

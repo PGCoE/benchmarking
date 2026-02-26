@@ -24,4 +24,3 @@ RUN pip install --upgrade pip && \
 
 COPY prepare-entry.py /prepare-entry.py
 COPY gather-pairs.py /gather-pairs.py
-COPY metrics.py /metrics.py

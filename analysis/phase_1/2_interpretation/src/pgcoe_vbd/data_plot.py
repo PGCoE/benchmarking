@@ -219,7 +219,29 @@ def plot_msa():
 
     row = df_subset.iloc[0]
 
-    header = f"Sample: {sample}\nTarget: {s1}\nSubject: {s2}\n\n"
+    match, valid, invalid, ins, del_, sub = df_subset[["match", "valid", "invalid", "ins", "del", "sub"]].iloc[0]
+    pid = 100 * match / valid
+    termini_status = 'invalid' if st.session_state.ignore_termini else 'valid'
+
+    header = [
+        f"Sample: {sample}",
+        f"Target: {s1}",
+        f"Query: {s2}",
+        "",
+        f"Identity: {pid:.2f}%",
+        "",
+        f"valid: {valid}",
+        f"invalid: {invalid}",
+        f"ins {ins}",
+        f"del: {del_}",
+        f"sub: {sub}",
+        f"match: {match}",
+        "",
+        f"** Invalid sites not counted in identity calculation **",
+        f"** Terminal indels treated as {termini_status} sites **",
+        "",
+        ""
+    ]
 
     try:
         s1 = io_ops.load_one_sequence(row["assembly_s1"])
@@ -228,6 +250,6 @@ def plot_msa():
         st.exception(e)
     aln = metrics.align_pair(s1, s2)
 
-    alignment_text = header + str(aln)
+    alignment_text = '\n'.join(header) + str(aln)
 
     st.code(alignment_text)
