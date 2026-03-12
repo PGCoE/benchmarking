@@ -13,18 +13,18 @@ for d in data_formatted/*; do
   [ ${#meta[@]} -gt 0 ] || { echo "  No .xlsx in $d, skipping"; continue; }
 
   docker run --rm \
-    -v "$PWD":/data \
-    -w /data \
-    public.ecr.aws/o8h2f0o1/pgcoe_vb_phase1_data_processing:1.0 \
+    -v "$PWD":/"$PWD" \
+    public.ecr.aws/o8h2f0o1/pgcoe_vb_phase1_data_processing:1.1 \
     ./prepare-entry.py \
-      --meta "${meta[0]}" \
-      --fasta "$d"/assemblies/* \
-      --outdir /data/prepared_entries/
+      --meta "$PWD/${meta[0]}" \
+      --fasta "$PWD/$d"/assemblies/* \
+      --outdir "$PWD/prepared_entries/" \
+      --workflow-map "$PWD"/workflow_map.csv
 done
 
 docker run --rm \
-    -v "$PWD":/data \
-    -w /data \
-    public.ecr.aws/o8h2f0o1/pgcoe_vb_phase1_data_processing:1.0 \
+    -v "$PWD":"$PWD" \
+    public.ecr.aws/o8h2f0o1/pgcoe_vb_phase1_data_processing:1.1 \
     ./gather-pairs.py \
-      --input prepared_entries/*.csv
+      --input "$PWD"/prepared_entries/*.csv \
+      --outdir "$PWD"

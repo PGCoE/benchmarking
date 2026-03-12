@@ -43,22 +43,12 @@ This document describes the workflow for analyzing the **Phase 1 viral benchmark
 
 ---
 
-## Step 3. Calculate pairwise metrics
-Run the benchmarking metrics with:
-
-```bash
-docker run --rm -v "$PWD":/data public.ecr.aws/o8h2f0o1/pgcoe_vb_phase1_data_processing:1.0 \
-    ./metrics.py \
-    --input /data/samplesheet.pairs.csv \
-    --outdir /data/metrics
-```
-
-## Step 4. Interpret the data
+## Step 3. Run the dashboard
 ```bash
 docker run \
     --rm \
     -v "$PWD":/data \
     -p 8501:8501 \
-    public.ecr.aws/o8h2f0o1/pgcoe_vb_phase1_interpretation:1.0
+    public.ecr.aws/o8h2f0o1/pgcoe_vb_phase1_interpretation:1.1
 ```
-> Load the metrics files generated in step 3
+> Load the samplesheet.pairs.csv file generated in step 2
