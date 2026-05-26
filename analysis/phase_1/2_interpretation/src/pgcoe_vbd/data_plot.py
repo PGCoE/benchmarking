@@ -107,7 +107,7 @@ def plot_heatmap(method="average", title="Pairwise Dissimilarity Heatmap"):
 
     # Convert to numeric array
     A = mat.apply(pd.to_numeric, errors="coerce").to_numpy(
-        dtype=np.float64, copy=False
+        dtype=np.float64, copy=True
     )
 
     # Ensure zero diagonal
