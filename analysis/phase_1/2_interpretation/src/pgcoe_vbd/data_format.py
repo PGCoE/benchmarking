@@ -61,13 +61,13 @@ def row_stats(df, ignore_termini: bool = False):
         out['invalid'] = out['invalid'] + term
 
     # Fraction of valid sites based on total sites (valid + invalid)
-    out["valid_frac"] = out["valid"] / (out["valid"] + out["invalid"])
+    out["percent_overlap"] = 100 * out["valid"] / (out["valid"] + out["invalid"])
 
     # Fraction of site classifications based on valid sites
     for col in STAT_COLS:
         if col in ["valid", "invalid"]:
             continue
-        out[col + "_frac"] = out[col] / out["valid"]
+        out["percent_" + col] = 100 * out[col] / out["valid"]
 
     return out
 
@@ -92,7 +92,7 @@ def apply_grouping(col_in, col_out):
 def group_stats() -> pd.DataFrame:
     df = st.session_state.df_final
 
-    stats_cols = [c + "_frac" for c in METRICS_COLS]
+    stats_cols = ["percent_" + c for c in METRICS_COLS]
 
     agg = defaultdict(lambda: defaultdict(list))
     samples_by_group = defaultdict(set)
@@ -145,8 +145,8 @@ def group_stats() -> pd.DataFrame:
 
 
 def to_distance_matrix() -> pd.DataFrame:
-    df = st.session_state.df_final[["gcol_a", "gcol_b", "match_frac"]]
-    df["dissimilarity_frac"] = 1 - df["match_frac"]
+    df = st.session_state.df_final[["gcol_a", "gcol_b", "percent_match"]]
+    df["dissimilarity_frac"] = 1 - (df["percent_match"] / 100)
 
     # Calculate average dissimilarity per pair
     agg = (
@@ -169,7 +169,8 @@ def to_distance_matrix() -> pd.DataFrame:
     D = mat.values.astype(float)
 
     if not np.allclose(D, D.T, equal_nan=False):
-        raise ValueError("Distance matrix is not symmetric.")
+        st.error("Distance matrix is not symmetric.")
+        return
 
     st.session_state.matrix_values = D
     st.session_state.matrix_labels = samples
@@ -180,7 +181,7 @@ def global_stats() -> pd.DataFrame:
     Compute global statistics across all pairwise comparisons.
     Returns min, max, mean, standard deviation, and median for each metric.
     """
-    stats_cols = [c + "_frac" for c in STAT_COLS]
+    stats_cols = ["percent_overlap"] + ["percent_" + c for c in STAT_COLS]
     agg = defaultdict(list)
 
     df = st.session_state.df_final

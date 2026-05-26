@@ -19,11 +19,11 @@ def get_counts(df, col_1, col_2, col):
         .groupby(col_1)
         .size()
         .reset_index(name='n')
-        .sort_values(['n', col_1], ascending=[False, True])
+        .rename(columns={col_1: col})
+        .sort_values(['n', col], ascending=[False, True])
         .reset_index(drop=True)
     )
 
-    count[col] = count[col_1].astype(str) + " (" + count["n"].astype(str) + ")"
     return count
 
 
@@ -78,6 +78,6 @@ def apply_selection(df, col):
         st.pills(col, opts, selection_mode="multi", key=pill_key, on_change=normalize, label_visibility='hidden')
 
     select = st.session_state[pill_key]
-    select_orig = "All" if "All" in select else count.loc[count[col].isin(select), col_1].tolist()
-    return {(col_1, col_2): select_orig}
+    select_final = "All" if "All" in select else select
+    return {(col_1, col_2): select_final}
 

@@ -128,7 +128,11 @@ def calculate_sequence_metrics(seq1, seq2) -> Dict[str, Any]:
 def read_alignment_file(input_file: str) -> List:
     """Read alignment file and return list of sequence records."""
     st.session_state.submsg.info('Reading alignment')
-    return list(screed.open(input_file))
+    records = list(screed.open(input_file))
+    for record in records:
+        if record.name.startswith('_R_'):
+            record.name = record.name[3:]
+    return records
 
 
 def run_mafft_alignment(sample_name: str, input_file: str) -> str:
@@ -137,7 +141,7 @@ def run_mafft_alignment(sample_name: str, input_file: str) -> str:
 
     with open(output_file, 'w') as out:
         subprocess.run(
-            ["mafft", "--auto", input_file],
+            ["mafft", "--auto", "--adjustdirection", input_file],
             stdout=out,
             stderr=subprocess.DEVNULL,
             check=True
@@ -169,16 +173,24 @@ def create_multi_fasta(sample_name: str, data: List[Dict]) -> Tuple[str, Dict[st
     return output_file, lengths
 
 
-def align_pair(seq1, seq2): 
-    aligner = PairwiseAligner() 
-    aligner.mode = "global" 
-    aligner.match_score = 2 
-    aligner.mismatch_score = -1 
-    aligner.open_gap_score = -5 
-    aligner.extend_gap_score = -1 
-    alignments = aligner.align(seq1, seq2) 
-    
-    return alignments[0]
+def reverse_complement(seq: str) -> str:
+    complement = str.maketrans('ACGTacgt', 'TGCAtgca')
+    return seq.translate(complement)[::-1]
+
+def align_pair(seq1, seq2):
+    aligner = PairwiseAligner()
+    aligner.mode = "global"
+    aligner.match_score = 2
+    aligner.mismatch_score = -1
+    aligner.open_gap_score = -5
+    aligner.extend_gap_score = -1
+
+    fwd_alignment = aligner.align(seq1, seq2)
+    rev_alignment = aligner.align(reverse_complement(seq1), seq2)
+
+    if rev_alignment[0].score > fwd_alignment[0].score:
+        return rev_alignment[0], True  # True = was reoriented
+    return fwd_alignment[0], False
 
 
 def run():
@@ -193,11 +205,22 @@ def run():
     groups = defaultdict(list)
     unique_keys = set()
 
-    for record in samplesheet.to_dict(orient="records"):
+    for i, record in enumerate(samplesheet.to_dict(orient="records")):
         unique_keys.update(record.keys())
 
         sample = str(record.get("sample", "")).strip()
-        if sample:
+        source = str(record.get("source", "")).strip()
+
+        if not sample:
+            st.error(f"Record {i} missing 'sample' column")
+            return
+        elif not source:
+            st.error(f"Record {i} missing 'source' column")
+            return
+        elif source.startswith("_R_"):
+            st.error(f"Source cannot start with '_R_'. Please update record {i}: {source}")
+            return
+        else:
             groups[sample].append(record)
 
     out: List[Dict[str, Any]] = []

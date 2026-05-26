@@ -20,7 +20,7 @@ import sys
 import textwrap
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from openpyxl import load_workbook
 
@@ -31,20 +31,23 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-VERSION = "1.1"
+VERSION = "1.2"
 
 REQUIRED_COLUMNS = [
-    'SRA ID',
-    'Assembly Species / Segment',
+    'Sample ID',
+    'Assembly Species',
+    'Segment',
     'Assembly Filename',
     'Assembly Generated?',
-    'Sample ID',
+    'Reference',
     'Compute Environment (HPC cluster, cloud/local workstation)',
     'Workflow Name & Version',
     'Workflow Github Link (if hosted/public on GH)',
 ]
 
 ASSEMBLY_GENERATED_VALUES = {'true', 'yes', '1', 'y'}
+
+WET_LAB_KEY_COLS = ('sample_prefix', 'assembly_species')
 
 
 def sanitize_string(name: str, replacement: str = "_") -> str:
@@ -94,27 +97,36 @@ def load_workbook_data(file_path: str) -> Tuple[str, Dict]:
 
     column_indices = {col: column_names.index(col) for col in REQUIRED_COLUMNS}
     parsed_data = defaultdict(dict)
+    skip_reasons = []
 
     for row_idx, row in enumerate(data[6:], start=7):
         if not row or len(row) <= max(column_indices.values()):
             continue
         try:
-            sra_id             = row[column_indices['SRA ID']]
-            sp_sg              =  row[column_indices['Assembly Species / Segment']]
-            if not sp_sg:
-                continue     
-            sp_sg_parts        = [ i.lower().strip() for i in sp_sg.split('/') ]
-            species            = sp_sg_parts[0]
-            segment            = sp_sg_parts[1] if len(sp_sg_parts) > 1 else 'wg'
+            sid                = row[column_indices['Sample ID']]
+            species            = row[column_indices['Assembly Species']]
+            segment            = row[column_indices['Segment']]
             assembly_generated = str(row[column_indices['Assembly Generated?']] or '').lower().strip()
 
-            if not sra_id or not species or not segment or assembly_generated not in ASSEMBLY_GENERATED_VALUES:
+            if not sid:
+                skip_reasons.append(f"  Row {row_idx}: missing Sample ID")
+                continue
+            if not species:
+                skip_reasons.append(f"  Row {row_idx} ({sid}): missing Assembly Species")
+                continue
+            if not segment:
+                segment = "wg"
+            if assembly_generated not in ASSEMBLY_GENERATED_VALUES:
+                skip_reasons.append(
+                    f"  Row {row_idx} ({sid}): 'Assembly Generated?' value '{assembly_generated}' "
+                    f"not in accepted values {sorted(ASSEMBLY_GENERATED_VALUES)}"
+                )
                 continue
 
-            parsed_data[str(sra_id)][(species, segment)] = {
+            parsed_data[str(sid)][(species, segment)] = {
                 'name':          row[column_indices['Sample ID']],
                 'file':          row[column_indices['Assembly Filename']],
-                'source':     source,
+                'source':        source,
                 'compute_env':   str(row[column_indices['Compute Environment (HPC cluster, cloud/local workstation)']] or '').lower().strip(),
                 'workflow':      str(row[column_indices['Workflow Name & Version']] or '').lower().strip(),
                 'workflow_link': str(row[column_indices['Workflow Github Link (if hosted/public on GH)']] or '').lower().strip(),
@@ -124,6 +136,9 @@ def load_workbook_data(file_path: str) -> Tuple[str, Dict]:
 
         except (IndexError, KeyError) as e:
             logger.warning(f"Skipping row {row_idx} due to parsing error: {e}")
+
+    if skip_reasons:
+        logger.warning(f"{len(skip_reasons)} row(s) skipped:\n" + "\n".join(skip_reasons))
 
     if not parsed_data:
         sys.exit("Error: No valid assembly data found in workbook.")
@@ -149,15 +164,116 @@ def load_workflow_map(path: str) -> Dict[str, Tuple[str, str]]:
 
 
 def apply_workflow_map(data: Dict, workflow_map: Dict) -> Dict:
-    for sra_id, sp_sg in data.items():
+    for sid, sp_sg in data.items():
         for (species, segment), info in sp_sg.items():
             workflow = info.get('workflow', '')
             if not workflow:
                 continue
             if workflow not in workflow_map:
-                raise ValueError(f"Workflow '{workflow}' (SRA: {sra_id}, species: {species}, segment: {segment}) not found in workflow map.")
+                raise ValueError(f"Workflow '{workflow}' (sid: {sid}, species: {species}, segment: {segment}) not found in workflow map.")
             info['workflow_alt'], info['workflow_version'] = workflow_map[workflow]
     return data
+
+
+def load_wet_lab(meta_path: str) -> Optional[Tuple[List[str], Dict[Tuple[str, str], Dict]]]:
+    """
+    Look for wet-lab.csv in the same directory as the metadata file.
+    Returns (extra_columns, lookup) where lookup is keyed by
+    (sample_prefix_lower, assembly_species_lower), or None if the file
+    does not exist.
+
+    'sample_prefix' is matched as a prefix of the Sample ID (case-insensitive).
+    'assembly_species' is matched against the Assembly Species field (case-insensitive).
+    """
+    wet_lab_path = Path(meta_path).expanduser().resolve().parent / "wet-lab.csv"
+    if not wet_lab_path.exists():
+        logger.info("No wet-lab.csv found alongside metadata file; skipping wet-lab join.")
+        return None
+
+    logger.info(f"Loading wet-lab data from {wet_lab_path}...")
+    lookup: Dict[Tuple[str, str], Dict] = {}
+    extra_cols: List[str] = []
+
+    with open(wet_lab_path, newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        if reader.fieldnames is None:
+            logger.warning("wet-lab.csv appears to be empty; skipping wet-lab join.")
+            return None
+        
+        for col in WET_LAB_KEY_COLS:
+            if col not in reader.fieldnames:
+                sys.exit(
+                    f"Error: wet-lab.csv is missing required key column '{col}'. "
+                    f"Expected columns: {list(WET_LAB_KEY_COLS)}"
+                )
+
+        extra_cols = [c for c in reader.fieldnames if c not in WET_LAB_KEY_COLS]
+
+        for row_idx, row in enumerate(reader, start=2):
+            prefix  = (row.get('sample_prefix') or '').strip().lower()
+            species = (row.get('assembly_species') or '').strip().lower()
+            if not prefix or not species:
+                logger.warning(f"wet-lab.csv row {row_idx}: missing sample_prefix or assembly_species; skipping.")
+                continue
+            key = (prefix, species)
+            if key in lookup:
+                logger.warning(
+                    f"wet-lab.csv row {row_idx}: duplicate key (sample_prefix='{prefix}', "
+                    f"assembly_species='{species}'); later row will overwrite earlier."
+                )
+            lookup[key] = {c: (row.get(c) or '') for c in extra_cols}
+
+    logger.info(f"Loaded {len(lookup)} wet-lab record(s) with extra columns: {extra_cols}")
+    return extra_cols, lookup
+
+
+def join_wet_lab(data: Dict, wet_lab: Optional[Tuple[List[str], Dict]]) -> Tuple[Dict, List[str]]:
+    """
+    For each assembly entry, find the best-matching wet-lab row by checking
+    whether the sample_prefix (from wet-lab.csv) is a prefix of the Sample ID,
+    AND the assembly_species matches (case-insensitive).
+
+    Attaches wet-lab fields to each info dict and returns the list of extra
+    column names (empty list if no wet-lab data was loaded).
+    """
+    if wet_lab is None:
+        return data, []
+
+    extra_cols, lookup = wet_lab
+
+    # Pre-group lookup keys by species for efficiency
+    by_species: Dict[str, List[Tuple[str, Dict]]] = defaultdict(list)
+    for (prefix, species), fields in lookup.items():
+        by_species[species].append((prefix, fields))
+
+    unmatched: List[str] = []
+
+    for sid, sp_sg in data.items():
+        sid_lower = sid.lower()
+        for (species, segment), info in sp_sg.items():
+            species_lower = species.lower()
+            matched_fields: Optional[Dict] = None
+
+            # Find the longest matching prefix for this sid + species
+            best_prefix_len = -1
+            for prefix, fields in by_species.get(species_lower, []):
+                if sid_lower.startswith(prefix) and len(prefix) > best_prefix_len:
+                    matched_fields = fields
+                    best_prefix_len = len(prefix)
+
+            if matched_fields is None:
+                unmatched.append(f"  {sid}/{species}_{segment}")
+                matched_fields = {c: '' for c in extra_cols}
+
+            info.update(matched_fields)
+
+    if unmatched:
+        logger.warning(
+            f"{len(unmatched)} assembly entry/entries had no matching wet-lab row "
+            f"(will have empty wet-lab fields):\n" + "\n".join(unmatched)
+        )
+
+    return data, extra_cols
 
 
 def stage_gzip_to_outdir(src: Path, dst_dir: Path) -> Path:
@@ -198,11 +314,11 @@ def validate_and_process_fasta_files(data: Dict, fasta_files: List[str], outdir:
 
     fasta_outdir = outdir / "fasta"
 
-    for sra_id, sp_sg in data.items():
+    for sid, sp_sg in data.items():
         for (species, segment), info in sp_sg.items():
             ref = str(info.get('file') or '').strip()
             if not ref:
-                logger.warning(f"Empty filename for {sra_id}/{species}_{segment}; skipping.")
+                logger.warning(f"Empty filename for {sid}/{species}_{segment}; skipping.")
                 continue
 
             ref_path = Path(ref)
@@ -217,45 +333,45 @@ def validate_and_process_fasta_files(data: Dict, fasta_files: List[str], outdir:
             if candidate is None or not candidate.exists():
                 if ignore_missing:
                     continue
-                sys.exit(f'Error: Required file "{ref}" (for {sra_id}/{segment}) not found among --fasta files.')
+                sys.exit(f'Error: Required file "{ref}" (for {sid}/{segment}) not found among --fasta files.')
 
             info['file'] = str(stage_gzip_to_outdir(candidate, fasta_outdir))
 
     return data
 
 
-def export_data(data: Dict, source: str, outdir: Path) -> None:
+def export_data(data: Dict, source: str, outdir: Path, wet_lab_cols: List[str]) -> None:
     stem = sanitize_string(source)
 
-    # json_path = outdir / f'{stem}.json'
-    # try:
-    #     with json_path.open('w', encoding='utf-8') as f:
-    #         json.dump(data, f, indent=4, ensure_ascii=False)
-    #     logger.info(f'Data exported to {json_path}')
-    # except Exception as e:
-    #     sys.exit(f"Error: Could not write {json_path}: {e}")
-
-    csv_rows = [
-        {
-            'sample':            f'{sanitize_string(sra_id)}_{sanitize_string(species)}' + ('' if segment == 'wg' else sanitize_string(segment)),
-            'species':           sanitize_string(species),
-            'segment':           sanitize_string(segment),
-            'assembly':          info['file'],
-            'source':         source,
-            'workflow':          info['workflow'],
-            'workflow_alt':      info['workflow_alt'],
-            'workflow_version':  info['workflow_version'],
-            'compute_env':       info['compute_env'],
-        }
-        for sra_id, sp_sg in data.items()
-        for (species, segment), info in sp_sg.items()
+    base_fields = [
+        'sample', 'species', 'segment', 'assembly', 'source',
+        'workflow', 'workflow_alt', 'workflow_version', 'compute_env',
     ]
+    fieldnames = base_fields + wet_lab_cols
+
+    csv_rows = []
+    for sid, sp_sg in data.items():
+        for (species, segment), info in sp_sg.items():
+            row = {
+                'sample':           sid.replace("_", "-"),
+                'species':          sanitize_string(species),
+                'segment':          sanitize_string(segment),
+                'assembly':         info['file'],
+                'source':           source,
+                'workflow':         info['workflow'],
+                'workflow_alt':     info['workflow_alt'],
+                'workflow_version': info['workflow_version'],
+                'compute_env':      info['compute_env'],
+            }
+            for col in wet_lab_cols:
+                row[col] = info.get(col, '')
+            csv_rows.append(row)
 
     csv_path = outdir / f'{stem}.csv'
     try:
         with csv_path.open('w', newline='', encoding='utf-8') as f:
             if csv_rows:
-                writer = csv.DictWriter(f, fieldnames=csv_rows[0].keys())
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
                 writer.writeheader()
                 writer.writerows(csv_rows)
         logger.info(f'Data exported to {csv_path}')
@@ -290,7 +406,7 @@ def main():
 
     logger.info("Loading workbook data...")
     source, data = load_workbook_data(args.meta)
-    logger.info(f"source: {source} | SRA entries: {len(data)}")
+    logger.info(f"source: {source} | sid entries: {len(data)}")
 
     if args.workflow_map:
         logger.info("Applying workflow map...")
@@ -300,11 +416,14 @@ def main():
         except ValueError as e:
             sys.exit(f"Error: {e}")
 
+    wet_lab = load_wet_lab(args.meta)
+    data, wet_lab_cols = join_wet_lab(data, wet_lab)
+
     logger.info("Validating and staging FASTA files...")
     data = validate_and_process_fasta_files(data, args.fasta, outdir, args.ignore_missing)
 
     logger.info("Exporting processed data...")
-    export_data(data, source, outdir)
+    export_data(data, source, outdir, wet_lab_cols)
 
     logger.info("Done.")
 

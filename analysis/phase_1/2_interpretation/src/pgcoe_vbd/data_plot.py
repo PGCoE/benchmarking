@@ -180,54 +180,52 @@ def plot_heatmap(method="average", title="Pairwise Dissimilarity Heatmap"):
 
     st.session_state.fig_heatmap = fig
 
-def plot_sample_dist():
-    df_final = st.session_state.df_final
-
-    if df_final.empty:
-        return
-    
-    gcol = st.session_state.get('gcol', '')
-    gcol_1 = gcol + "_s1"
-    gcol_2 = gcol + "_s2"
-    
-    fig = px.box(
-        df_final,
-        x="sample",
-        y="match_frac",
-        points="all",
-        hover_data=[gcol_1, gcol_2]
-    )
-
-    st.session_state.fig_sample_dist = fig
-
-def plot_msa():
-    df = st.session_state.df_final
-    sample, s1, s2 = st.session_state.sample_selection
+def plot_msa(sample, s1, s2):
 
     if not sample or not s1 or not s2:
         return
+    
+    df = st.session_state.df_final
 
     df_subset = df[
         (df["sample"] == sample) &
         (df["source_s1"] == s1) &
         (df["source_s2"] == s2)
     ]
-
+    # try other way - sometimes group variables are swapped
+    if df_subset.empty:
+        df_subset = df[
+        (df["sample"] == sample) &
+        (df["source_s1"] == s2) &
+        (df["source_s2"] == s1)
+    ]
+        
     if df_subset.empty:
         st.error("No rows matched sample/source filters.")
         return
 
     row = df_subset.iloc[0]
 
+    try:
+        seq1 = io_ops.load_one_sequence(row["assembly_s1"])
+        seq2 = io_ops.load_one_sequence(row["assembly_s2"])
+    except Exception as e:
+        st.exception(e)
+    aln, revcomp = metrics.align_pair(seq1, seq2)
+
     match, valid, invalid, ins, del_, sub = df_subset[["match", "valid", "invalid", "ins", "del", "sub"]].iloc[0]
     pid = 100 * match / valid
+    overlap = 100 * valid / (valid + invalid)
     termini_status = 'invalid' if st.session_state.ignore_termini else 'valid'
+    target = s1 + " (reverse complement)" if revcomp else s1
+    query = s2
 
     header = [
         f"Sample: {sample}",
-        f"Target: {s1}",
-        f"Query: {s2}",
+        f"Target: {target}",
+        f"Query: {query}",
         "",
+        f"Overlap: {overlap:.2f}%",
         f"Identity: {pid:.2f}%",
         "",
         f"valid: {valid}",
@@ -243,13 +241,53 @@ def plot_msa():
         ""
     ]
 
-    try:
-        s1 = io_ops.load_one_sequence(row["assembly_s1"])
-        s2 = io_ops.load_one_sequence(row["assembly_s2"])
-    except Exception as e:
-        st.exception(e)
-    aln = metrics.align_pair(s1, s2)
-
     alignment_text = '\n'.join(header) + str(aln)
 
     st.code(alignment_text)
+
+def plot_dist(group=False):
+    df_final = st.session_state.df_final
+    if df_final.empty:
+        return
+
+    gcol = st.session_state.get('gcol', '')
+    gcol_1, gcol_2 = gcol + "_s1", gcol + "_s2"
+
+    if group:
+        df_swapped = df_final.copy()
+        df_swapped[gcol_1], df_swapped[gcol_2] = df_final[gcol_2].values, df_final[gcol_1].values
+        df = pd.concat([df_final, df_swapped], ignore_index=True)
+    else:
+        df = df_final
+
+    custom_data = ["sample", gcol_1, gcol_2, "percent_overlap"]
+    if gcol != "source":
+        custom_data += ["source_s1", "source_s2"]
+
+    x_col = gcol_1 if group else "sample"
+    category_order = (
+        df.groupby(x_col)["percent_match"]
+        .mean()
+        .sort_values()
+        .index.tolist()
+    )
+
+    fig = px.box(
+        df,
+        x=x_col,
+        y="percent_match",
+        points="all",
+        custom_data=custom_data,
+        category_orders={x_col: category_order}
+    )
+
+    fig.update_traces(hovertemplate=(
+        "sample: %{customdata[0]}<br>"
+        f"{gcol_1}: %{{customdata[1]}}<br>"
+        f"{gcol_2}: %{{customdata[2]}}<br>"
+        "match: %{y}%<br>"
+        f"overlap: %{{customdata[3]:.2f}}%<br>"
+        "<extra></extra>"
+    ))
+
+    return fig

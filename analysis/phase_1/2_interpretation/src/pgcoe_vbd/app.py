@@ -20,6 +20,7 @@ st.set_page_config(layout="wide")
 st.session_state.setdefault("warning_message", None)
 st.session_state.setdefault("df", pd.DataFrame())
 st.session_state.setdefault("df_final", pd.DataFrame())
+st.session_state.setdefault("df_f1_fail", pd.DataFrame())
 
 st.session_state.progress = st.empty()
 st.session_state.msg      = st.empty()
@@ -59,10 +60,10 @@ with st.sidebar:
 #-------------------#
 if not st.session_state.df.empty:
 
-    tab1, tab2, tab3 = st.tabs(["Full Dataset", "Global View", "Sample View"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Full Dataset", "Global View", "Sample View", "Group View", "Problem Samples"])
         
     with tab1:
-        st.dataframe(st.session_state.df)  
+        st.dataframe(st.session_state.df) 
         st.info("💡 This table can be downloaded and re-used in place of the samplesheet!")        
 
     with tab2:
@@ -71,7 +72,14 @@ if not st.session_state.df.empty:
     
     with tab3:
         if not st.session_state.df_final.empty:
-           ui.sample_view()  
+           ui.dist_view(group=False)
+
+    with tab4:
+        if not st.session_state.df_final.empty:
+           ui.dist_view(group=True)
+    with tab5:
+        if not st.session_state.df_f1_fail.empty:
+            st.dataframe(st.session_state.df_f1_fail)
         
 
 elif st.session_state.warning_message:

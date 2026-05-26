@@ -14,7 +14,7 @@ for d in data_formatted/*; do
 
   docker run --rm \
     -v "$PWD":/"$PWD" \
-    public.ecr.aws/o8h2f0o1/pgcoe_vb_phase1_data_processing:1.1 \
+    public.ecr.aws/o8h2f0o1/pgcoe_vb_phase1_data_processing:1.2 \
     ./prepare-entry.py \
       --meta "$PWD/${meta[0]}" \
       --fasta "$PWD/$d"/assemblies/* \
@@ -24,7 +24,7 @@ done
 
 docker run --rm \
     -v "$PWD":"$PWD" \
-    public.ecr.aws/o8h2f0o1/pgcoe_vb_phase1_data_processing:1.1 \
+    public.ecr.aws/o8h2f0o1/pgcoe_vb_phase1_data_processing:1.2 \
     ./gather-pairs.py \
       --input "$PWD"/prepared_entries/*.csv \
       --outdir "$PWD"

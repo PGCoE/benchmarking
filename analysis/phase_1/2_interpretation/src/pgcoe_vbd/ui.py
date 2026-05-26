@@ -85,19 +85,20 @@ def apply_filters():
 
     st.header("Apply filters")
     
-    st.markdown("### Filter 1: Minimum sequence overlap")
+    st.markdown("### Filter 1: Minimum sequence overlap (%)")
     min_valid = st.number_input(
-        "Select a threshold (default: `0.80`)",
-        min_value=0.0,
-        max_value=1.0,
-        step=0.01,
-        value=0.80,
-        format="%.2f",
-        help=f"Minimum overlap (valid_frac) in sample assemblies between two {gcol}s to be considered"
+        "Select a threshold (default: `80%`)",
+        min_value=-1,
+        max_value=100,
+        step=10,
+        value=80,
+        help=f"Minimum overlap (percent_overlap) in sample assemblies between two {gcol}s to be considered"
     )
  
-    df_subset = df[df["valid_frac"] > min_valid]
+    df_subset = df[df["percent_overlap"] >= min_valid]
+    df_f1_fail = df[df["percent_overlap"] < min_valid]
     st.session_state["samples_f1"] = len(df_subset)
+    st.session_state["df_f1_fail"] = df_f1_fail
 
     st.markdown("### Filter 2: Include variables")
     exclude = set(data_filter.FILT_COLS_EXCLUDE) | {gcol}
@@ -116,6 +117,8 @@ def apply_filters():
                 if col_1 not in valid_cols or col_2 not in valid_cols:
                     continue
                 if 'All' in values:
+                    continue
+                if not values:
                     continue
                 df_subset = df_subset[
                     df_subset[col_1].isin(values) & df_subset[col_2].isin(values)
@@ -162,8 +165,12 @@ def global_view():
     st.subheader("Global Statistics (After Filtering)")
     st.dataframe(st.session_state.df_global)
 
-
+    st.session_state.matrix_values = []
     data_format.to_distance_matrix()
+    if len(st.session_state.matrix_values) == 0:
+        st.warning("Plots could not be generated")
+        return
+
     data_plot.plot_pcoa()
     data_plot.plot_heatmap()
 
@@ -184,29 +191,27 @@ def global_view():
             else:
                 st.warning("PCoA could not be generated")
 
-def sample_view():
-    st.session_state.fig_sample_dist = None
-    data_plot.plot_sample_dist()
+def dist_view(group=False):
+    fig = data_plot.plot_dist(group=group)
+    if not fig:
+        st.warning("Distribution could not be generated")
+        return
 
-    fig_sample_dist = st.session_state.fig_sample_dist
-    if fig_sample_dist:
-        sample_selection = st.plotly_chart(fig_sample_dist, use_container_width=False, on_select='rerun', selection_mode='points')
+    selection = st.plotly_chart(fig, use_container_width=False, on_select='rerun', selection_mode='points', key=f'dist_view_group={group}')
+    points = selection.get('selection', {}).get('points', [])
 
-        points = sample_selection.get('selection', {}).get('points', [])
+    if not points:
+        st.info("Select a data point to display the multiple sequence alignment")
+        return
 
-        if not points:
-            st.info("Select a data point to display the multiple sequence alignment")
-        else:
-            point0 = points[0]
-            s1, s2 = point0.get('customdata', [None, None])
-            sample = point0.get('x', None)
+    gcol = st.session_state.get('gcol', '')
+    cd_idx = [0, 1, 2] if gcol == "source" else [0, 4, 5]
+    values = points[0].get('customdata', [])
+    sample, s1, s2 = (values[i] for i in cd_idx)
 
-            if sample and s1 and s2:
-                st.session_state.sample_selection = (sample, s1, s2)
-                st.divider()
-                data_plot.plot_msa()
-    else:
-        st.warning("Sample distributions could not be generated")
+    if sample and s1 and s2:
+        st.divider()
+        data_plot.plot_msa(sample, s1, s2)
 
 def calc_metrics():
     with st.container(border=True):
