@@ -155,10 +155,10 @@ def to_distance_matrix() -> pd.DataFrame:
     )
 
     samples = sorted(set(agg["gcol_a"]).union(set(agg["gcol_b"])))
-    mat = pd.DataFrame(index=samples, columns=samples, dtype=float)
-    
-    # Set diagonal to zero
-    np.fill_diagonal(mat.values, 0.0)
+    n = len(samples)
+    arr = np.full((n, n), np.nan)
+    np.fill_diagonal(arr, 0.0)
+    mat = pd.DataFrame(arr, index=samples, columns=samples, dtype=float)
     
     # Fill both [A,B] and [B,A] for symmetry
     for _, row in agg.iterrows():
